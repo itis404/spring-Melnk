@@ -6,8 +6,7 @@ StudyMarket — MPA-маркетплейс студенческих товаро
 ## Быстрый запуск
 
 ```bash
-cp .env
-docker compose up --build
+./scripts/run_docker_with_telegram.sh                            
 ```
 
 Приложение: http://localhost:8080  
