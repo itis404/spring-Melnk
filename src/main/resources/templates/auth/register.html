@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Регистрация')}"></head>
+<body class="auth-page">
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+<main class="auth-layout">
+    <section class="auth-copy reveal">
+        <span class="eyebrow">новый участник</span>
+        <h1>Аккаунт для сделок внутри кампуса.</h1>
+        <p>Добавьте контакты и аватар, чтобы покупателям было проще узнать вас в чате и договориться о встрече.</p>
+    </section>
+    <form class="form-card reveal" th:action="@{/register}" th:object="${registrationForm}" method="post" data-submit-once>
+        <h2>Регистрация</h2>
+        <div class="flash danger" th:if="${#fields.hasGlobalErrors()}" th:each="err : ${#fields.globalErrors()}" th:text="${err}">Ошибка</div>
+        <label>
+            <span>Логин</span>
+            <input th:field="*{username}" autocomplete="username" required>
+            <small th:errors="*{username}"></small>
+        </label>
+        <label>
+            <span>Имя</span>
+            <input th:field="*{fullName}" autocomplete="name" required>
+            <small th:errors="*{fullName}"></small>
+        </label>
+        <label>
+            <span>Email</span>
+            <input th:field="*{email}" type="email" autocomplete="email" required>
+            <small th:errors="*{email}"></small>
+        </label>
+        <label>
+            <span>Пароль</span>
+            <input th:field="*{password}" type="password" autocomplete="new-password" required minlength="6">
+            <small th:errors="*{password}"></small>
+        </label>
+        <label>
+            <span>Telegram chat id</span>
+            <input th:field="*{telegramChatId}" placeholder="Напишите боту /id и вставьте chat id">
+            <small th:errors="*{telegramChatId}"></small>
+        </label>
+        <button class="primary-button" type="submit">Создать аккаунт</button>
+    </form>
+</main>
+</body>
+</html>

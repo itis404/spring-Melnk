@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Заказы')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+<main class="narrow-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">сделки</span>
+            <h1>Мои заказы</h1>
+        </div>
+    </div>
+    <div class="order-tabs">
+        <a href="#purchases">Покупки</a>
+        <a href="#sales">Продажи</a>
+    </div>
+    <div class="order-section" id="purchases">
+        <h2>Покупки</h2>
+        <div class="order-list" th:if="${!purchaseOrders.isEmpty()}">
+            <article class="order-row order-row-product reveal"
+                     th:each="order : ${purchaseOrders}"
+                     th:with="item=${order.items[0]}, counterpart=${order.seller}">
+                <a class="order-thumb" th:href="@{/orders/{id}(id=${order.id})}">
+                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.title}">
+                </a>
+                <a class="order-copy" th:href="@{/orders/{id}(id=${order.id})}">
+                    <span th:text="${item.product.title}">Товар</span>
+                    <small th:text="'Продавец: ' + ${counterpart.fullName}">Продавец</small>
+                    <small th:text="'Дата: ' + ${#temporals.format(order.createdAt, 'dd.MM HH:mm')}">Дата</small>
+                    <small th:if="${item.product.status.name() != 'ACTIVE'}"
+                           th:text="'В архиве · ' + ${item.product.status.label}">В архиве</small>
+                </a>
+                <strong th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'WHITESPACE', 0, 'COMMA')} + ' ₽'">1 450 ₽</strong>
+                <em class="order-status" th:classappend="${' status-' + order.status.name().toLowerCase()}" th:text="${order.status.label}">Новый</em>
+                <div class="order-actions">
+                    <a class="ghost-button compact-action" th:href="@{/chats/products/{productId}/users/{username}(productId=${item.product.id}, username=${counterpart.username})}">Написать</a>
+                    <form th:if="${order.status.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/complete(id=${order.id})}" method="post" data-submit-once>
+                        <button class="primary-button compact-action" type="submit">Завершить</button>
+                    </form>
+                    <form th:if="${order.status.name() == 'NEW' || order.status.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" data-submit-once>
+                        <button class="ghost-button compact-action" type="submit">Отменить</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+        <div class="empty-state compact-empty" th:if="${purchaseOrders.isEmpty()}">
+            <h3>Покупок пока нет</h3>
+            <p>Найдите товар в каталоге и забронируйте его.</p>
+            <div class="empty-actions">
+                <a class="primary-button" th:href="@{/}">Перейти в каталог</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-section" id="sales">
+        <h2>Продажи</h2>
+        <div class="order-list" th:if="${!saleOrders.isEmpty()}">
+            <article class="order-row order-row-product reveal"
+                     th:each="order : ${saleOrders}"
+                     th:with="item=${order.items[0]}, counterpart=${order.buyer}">
+                <a class="order-thumb" th:href="@{/orders/{id}(id=${order.id})}">
+                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.title}">
+                </a>
+                <a class="order-copy" th:href="@{/orders/{id}(id=${order.id})}">
+                    <span th:text="${item.product.title}">Товар</span>
+                    <small th:text="'Покупатель: ' + ${counterpart.fullName}">Покупатель</small>
+                    <small th:text="'Дата: ' + ${#temporals.format(order.createdAt, 'dd.MM HH:mm')}">Дата</small>
+                    <small th:if="${item.product.status.name() != 'ACTIVE'}"
+                           th:text="'В архиве · ' + ${item.product.status.label}">В архиве</small>
+                </a>
+                <strong th:text="${#numbers.formatDecimal(order.totalPrice, 0, 'WHITESPACE', 0, 'COMMA')} + ' ₽'">1 450 ₽</strong>
+                <em class="order-status" th:classappend="${' status-' + order.status.name().toLowerCase()}" th:text="${order.status.label}">Новый</em>
+                <div class="order-actions">
+                    <a class="ghost-button compact-action" th:href="@{/chats/products/{productId}/users/{username}(productId=${item.product.id}, username=${counterpart.username})}">Написать</a>
+                    <form th:if="${order.status.name() == 'NEW'}" th:action="@{/orders/{id}/confirm(id=${order.id})}" method="post" data-submit-once>
+                        <button class="primary-button compact-action" type="submit">Подтвердить</button>
+                    </form>
+                    <form th:if="${order.status.name() == 'NEW' || order.status.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" data-submit-once>
+                        <button class="ghost-button compact-action" type="submit">Отменить</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+        <div class="empty-state compact-empty" th:if="${saleOrders.isEmpty()}">
+            <h3>Продаж пока нет</h3>
+            <p>Опубликуйте товар, чтобы покупатели могли оформить заказ.</p>
+            <div class="empty-actions">
+                <a class="primary-button" th:href="@{/products/new}">Добавить товар</a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

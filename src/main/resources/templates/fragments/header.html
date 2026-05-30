@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<body>
+<header class="site-header" th:fragment="header">
+    <a class="brand" th:href="@{/}" aria-label="StudyMarket">
+        <span class="brand-mark">S</span>
+        <span>
+            <strong>StudyMarket</strong>
+            <small>campus marketplace</small>
+        </span>
+    </a>
+    <form class="header-search" th:action="@{/}" method="get">
+        <input type="search" name="q" th:value="${q}" placeholder="Найти на StudyMarket">
+        <button type="submit" aria-label="Найти">⌕</button>
+    </form>
+    <nav class="top-nav" aria-label="Основная навигация">
+        <a th:href="@{/}" th:classappend="${(currentPath == '/' || (#strings.startsWith(currentPath, '/products') && currentPath != '/products/new')) ? 'active' : ''}">Каталог</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/orders}" th:classappend="${#strings.startsWith(currentPath, '/orders') ? 'active' : ''}">Заказы</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/chats}" th:classappend="${#strings.startsWith(currentPath, '/chats') ? 'active' : ''}">Чат</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/profile}" th:classappend="${#strings.startsWith(currentPath, '/profile') ? 'active' : ''}">Профиль</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/products/new}" class="nav-pill" th:classappend="${currentPath == '/products/new' ? 'active' : ''}">Продать</a>
+    </nav>
+    <div class="auth-actions">
+        <button class="theme-toggle icon-button" type="button" title="Сменить тему" aria-label="Сменить тему" data-theme-toggle>
+            <span aria-hidden="true">☾</span>
+        </button>
+        <a sec:authorize="isAnonymous()" th:href="@{/login}" class="ghost-button">Войти</a>
+        <a sec:authorize="isAnonymous()" th:href="@{/register}" class="primary-button compact">Регистрация</a>
+        <a sec:authorize="isAuthenticated()" th:href="@{/profile}" class="user-chip" th:if="${currentUser != null}">
+            <img th:if="${currentUser.avatarUrl != null && !currentUser.avatarUrl.isBlank()}" th:src="${currentUser.avatarUrl}" th:alt="${currentUser.fullName}">
+            <span th:if="${currentUser.avatarUrl == null || currentUser.avatarUrl.isBlank()}"
+                  th:text="${#strings.substring(currentUser.fullName, 0, 1)}">S</span>
+        </a>
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+            <button class="ghost-button" type="submit">Выйти</button>
+        </form>
+    </div>
+</header>
+</body>
+</html>

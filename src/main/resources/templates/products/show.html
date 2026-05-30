@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${product.title})}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+<main class="product-page">
+    <section class="product-detail reveal">
+        <div class="detail-media">
+            <img th:src="${product.imageUrl}" th:alt="${product.title}">
+        </div>
+        <div class="detail-info">
+            <div class="product-meta">
+                <span th:text="${product.campus}">Кампус</span>
+                <span th:text="${product.condition.label}">Состояние</span>
+                <span th:text="${product.status.label}">Статус</span>
+            </div>
+            <h1 th:text="${product.title}">Товар</h1>
+            <div class="price-line">
+                <strong th:text="${#numbers.formatDecimal(product.price, 0, 'WHITESPACE', 0, 'COMMA')} + ' ₽'">1 450 ₽</strong>
+                <span class="seller-line">
+                    <img th:if="${product.seller.avatarUrl != null && !product.seller.avatarUrl.isBlank()}" th:src="${product.seller.avatarUrl}" th:alt="${product.seller.fullName}">
+                    <span th:if="${product.seller.avatarUrl == null || product.seller.avatarUrl.isBlank()}"
+                          class="avatar-fallback"
+                          th:text="${#strings.substring(product.seller.fullName, 0, 1)}">S</span>
+                    <span th:text="'Продавец: ' + ${product.seller.fullName}">Продавец</span>
+                </span>
+            </div>
+            <div class="category-row">
+                <span th:each="category : ${product.categories}"
+                      th:style="'--tag:' + ${category.accentColor}"
+                      th:text="${category.name}">Категория</span>
+            </div>
+            <div class="detail-actions" th:if="${owner}">
+                <a class="ghost-button" th:href="@{/products/{id}/edit(id=${product.id})}">Редактировать</a>
+                <form th:action="@{/products/{id}/delete(id=${product.id})}" method="post" data-submit-once>
+                    <button class="danger-button" type="submit">Снять с продажи</button>
+                </form>
+            </div>
+            <form sec:authorize="isAuthenticated()" th:if="${!owner}" class="checkout-panel" th:action="@{/products/{id}/orders(id=${product.id})}" th:object="${checkoutForm}" method="post" data-submit-once>
+                <h2>Оформить заказ</h2>
+                <label>
+                    <span>Комментарий продавцу</span>
+                    <textarea th:field="*{contactComment}" rows="3" placeholder="Когда удобно встретиться?"></textarea>
+                    <small th:errors="*{contactComment}"></small>
+                </label>
+                <button class="primary-button" type="submit">Забронировать</button>
+            </form>
+            <a sec:authorize="isAnonymous()" class="primary-button" th:href="@{/login}">Войти, чтобы заказать</a>
+        </div>
+    </section>
+
+    <section class="content-panel product-description reveal">
+        <span class="eyebrow">описание</span>
+        <h2>О товаре</h2>
+        <p th:text="${product.description}">Описание</p>
+    </section>
+
+    <section class="two-column">
+        <div class="content-panel reveal">
+            <div class="section-heading compact-heading">
+                <div>
+                    <span class="eyebrow">репутация</span>
+                    <h2>Отзывы</h2>
+                </div>
+            </div>
+            <form sec:authorize="isAuthenticated()" th:if="${!owner}" class="inline-review" th:action="@{/products/{id}/reviews(id=${product.id})}" th:object="${reviewForm}" method="post" data-submit-once>
+                <select th:field="*{rating}">
+                    <option value="5">5 · отлично</option>
+                    <option value="4">4 · хорошо</option>
+                    <option value="3">3 · нормально</option>
+                    <option value="2">2 · плохо</option>
+                    <option value="1">1 · ужасно</option>
+                </select>
+                <input th:field="*{comment}" placeholder="Короткий отзыв о продавце">
+                <button class="ghost-button" type="submit">Отправить</button>
+            </form>
+            <div class="review-list" th:if="${!product.reviews.isEmpty()}">
+                <article th:each="review : ${product.reviews}" class="review">
+                    <strong th:text="${review.author.fullName}">Автор</strong>
+                    <span th:text="${review.rating} + '/5'">5/5</span>
+                    <p th:text="${review.comment}">Комментарий</p>
+                </article>
+            </div>
+            <p class="muted" th:if="${product.reviews.isEmpty()}">Пока нет отзывов.</p>
+        </div>
+
+        <div class="content-panel reveal">
+            <div class="section-heading compact-heading">
+                <div>
+                    <span class="eyebrow">диалог</span>
+                    <h2>Чат по товару</h2>
+                </div>
+            </div>
+            <p class="muted">Уточните состояние, место встречи или попросите дополнительные фото.</p>
+            <form sec:authorize="isAuthenticated()" th:if="${!owner}" class="ajax-chat-form" th:action="@{/ajax/products/{id}/messages(id=${product.id})}" th:object="${chatMessageForm}" method="post">
+                <textarea th:field="*{body}" rows="3" placeholder="Здравствуйте, товар еще доступен?"></textarea>
+                <button class="primary-button" type="submit">Написать</button>
+            </form>
+            <a sec:authorize="isAuthenticated()" th:href="@{/chats/products/{id}(id=${product.id})}" class="ghost-button">Открыть чат</a>
+        </div>
+    </section>
+
+    <section class="section-wrap" th:if="${relatedProducts != null && !relatedProducts.isEmpty()}">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">похожие</span>
+                <h2>Похожие товары</h2>
+            </div>
+        </div>
+        <div class="product-grid related-grid">
+            <th:block th:each="related : ${relatedProducts}">
+                <div th:replace="~{fragments/product-card :: card(${related}, ${favoriteIds})}"></div>
+            </th:block>
+        </div>
+    </section>
+</main>
+</body>
+</html>

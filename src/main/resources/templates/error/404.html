@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Не найдено')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="narrow-page">
+    <section class="empty-state reveal">
+        <span class="eyebrow">404</span>
+        <h1>Страница не найдена</h1>
+        <p>Такой страницы нет в StudyMarket.</p>
+        <a class="primary-button" th:href="@{/}">В каталог</a>
+    </section>
+</main>
+</body>
+</html>

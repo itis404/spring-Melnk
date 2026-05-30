@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Чат')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="chat-page">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">сообщения</span>
+            <h1>Чат</h1>
+        </div>
+    </div>
+    <div class="chat-workspace">
+        <aside class="chat-sidebar">
+            <a class="chat-row reveal"
+               th:each="conversation : ${conversations}"
+               th:with="product=${conversation.product}, user=${conversation.counterpart}, last=${conversation.lastMessage}"
+               th:href="@{/chats/products/{productId}/users/{username}(productId=${product.id}, username=${user.username})}">
+                <span class="chat-avatar">
+                    <img th:if="${user.avatarUrl != null && !user.avatarUrl.isBlank()}" th:src="${user.avatarUrl}" th:alt="${user.fullName}">
+                    <span th:if="${user.avatarUrl == null || user.avatarUrl.isBlank()}"
+                          th:text="${#strings.substring(user.fullName, 0, 1)}">U</span>
+                </span>
+                <span class="chat-copy">
+                    <strong>
+                        <span th:text="${product.title}">Товар</span>
+                        <small th:text="'(@' + ${user.username} + ')'">(@user)</small>
+                    </strong>
+                    <em th:text="${#strings.abbreviate(last.body, 72)}">Сообщение</em>
+                </span>
+                <span class="chat-product-thumb">
+                    <img th:src="${product.imageUrl}" th:alt="${product.title}">
+                </span>
+            </a>
+        </aside>
+        <section class="chat-empty-panel">
+            <div class="empty-state" th:if="${conversations.isEmpty()}">
+                <h3>Сообщений пока нет</h3>
+                <p>Откройте товар и напишите продавцу.</p>
+                <div class="empty-actions">
+                    <a class="primary-button" th:href="@{/}">В каталог</a>
+                </div>
+            </div>
+            <div class="empty-state" th:if="${!conversations.isEmpty()}">
+                <h3>Выберите диалог</h3>
+                <p>Переписка откроется справа, список товаров останется под рукой.</p>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

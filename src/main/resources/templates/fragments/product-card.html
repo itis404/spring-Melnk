@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<body>
+<article class="product-card reveal" th:fragment="card(product, favoriteIds)">
+    <div class="product-media">
+        <a th:href="@{/products/{id}(id=${product.id})}">
+            <img th:src="${product.imageUrl}" th:alt="${product.title}">
+            <span class="status-chip" th:if="${product.status.name() != 'ACTIVE'}" th:text="${product.status.label}">Забронировано</span>
+        </a>
+        <button sec:authorize="isAuthenticated()"
+                class="icon-button favorite-button product-favorite"
+                th:classappend="${favoriteIds.contains(product.id)} ? 'active' : ''"
+                th:data-product-id="${product.id}"
+                th:aria-label="'Добавить в избранное: ' + ${product.title}"
+                title="Избранное"
+                type="button">
+            <span aria-hidden="true">♡</span>
+            <small class="favorite-count">0</small>
+        </button>
+    </div>
+    <div class="product-body">
+        <strong class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'WHITESPACE', 0, 'COMMA')} + ' ₽'">1 450 ₽</strong>
+        <a class="product-title" th:href="@{/products/{id}(id=${product.id})}" th:text="${product.title}">Товар</a>
+        <div class="product-meta">
+            <span th:text="${product.campus}">Кампус</span>
+            <span th:text="${product.condition.label}">Состояние</span>
+        </div>
+        <div class="seller-mini">
+            <img th:if="${product.seller.avatarUrl != null && !product.seller.avatarUrl.isBlank()}" th:src="${product.seller.avatarUrl}" th:alt="${product.seller.fullName}">
+            <span th:if="${product.seller.avatarUrl == null || product.seller.avatarUrl.isBlank()}"
+                  th:text="${#strings.substring(product.seller.fullName, 0, 1)}">S</span>
+            <small th:text="${product.seller.fullName}">Продавец</small>
+        </div>
+        <div class="category-row">
+            <span th:each="category : ${product.categories}"
+                  th:style="'--tag:' + ${category.accentColor}"
+                  th:text="${category.name}">Категория</span>
+        </div>
+    </div>
+</article>
+</body>
+</html>

@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: StudyMarket
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/studymarket}
+    username: ${SPRING_DATASOURCE_USERNAME:studymarket}
+    password: ${SPRING_DATASOURCE_PASSWORD:studymarket}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 32
+    show-sql: false
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      repositories:
+        enabled: false
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+  thymeleaf:
+    cache: false
+
+server:
+  port: ${SERVER_PORT:8082}
+  error:
+    whitelabel:
+      enabled: false
+
+logging:
+  level:
+    ru.studymarket: INFO
+    org.springframework.security: INFO
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
+app:
+  telegram:
+    bot-token: ${TELEGRAM_BOT_TOKEN:}
+    api-base-url: ${TELEGRAM_API_BASE_URL:https://api.telegram.org}
+    webhook-secret-token: ${TELEGRAM_WEBHOOK_SECRET_TOKEN:}
+    commands-enabled: ${TELEGRAM_COMMANDS_ENABLED:true}
+    polling-enabled: ${TELEGRAM_POLLING_ENABLED:true}
+    proxy-host: ${TELEGRAM_PROXY_HOST:}
+    proxy-port: ${TELEGRAM_PROXY_PORT:0}
+    proxy-type: ${TELEGRAM_PROXY_TYPE:HTTP}
+    connect-timeout-seconds: ${TELEGRAM_CONNECT_TIMEOUT_SECONDS:10}
+    read-timeout-seconds: ${TELEGRAM_READ_TIMEOUT_SECONDS:40}
