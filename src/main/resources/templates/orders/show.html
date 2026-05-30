@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Заказ')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+<main class="narrow-page">
+    <section class="content-panel reveal">
+        <span class="order-status" th:classappend="${' status-' + order.status.name().toLowerCase()}" th:text="${order.status.label}">Новый</span>
+        <h1 th:text="'Заказ #' + ${order.id}">Заказ</h1>
+        <div class="order-status-line" aria-label="Статус заказа">
+            <span th:classappend="${order.status.name() == 'NEW' || order.status.name() == 'CONFIRMED' || order.status.name() == 'COMPLETED'} ? 'active' : ''">Новый</span>
+            <span th:classappend="${order.status.name() == 'CONFIRMED' || order.status.name() == 'COMPLETED'} ? 'active' : ''">Подтвержден</span>
+            <span th:classappend="${order.status.name() == 'COMPLETED'} ? 'active' : ''">Завершен</span>
+            <span th:if="${order.status.name() == 'CANCELLED'}" class="active cancelled">Отменен</span>
+        </div>
+        <p th:text="'Покупатель: ' + ${order.buyer.fullName}">Покупатель</p>
+        <p th:text="'Продавец: ' + ${order.seller.fullName}">Продавец</p>
+        <p th:if="${order.contactComment}" th:text="'Комментарий: ' + ${order.contactComment}">Комментарий</p>
+        <div class="order-items">
+            <a class="order-item-card" th:each="item : ${order.items}" th:href="@{/products/{id}(id=${item.product.id})}">
+                <span class="order-thumb">
+                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.title}">
+                </span>
+                <span class="order-copy">
+                    <span th:text="${item.product.title}">Товар</span>
+                    <small th:if="${item.product.status.name() != 'ACTIVE'}"
+                           th:text="'В архиве · ' + ${item.product.status.label}">В архиве</small>
+                </span>
+                <strong th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'WHITESPACE', 0, 'COMMA')} + ' ₽'">1 450 ₽</strong>
+            </a>
+        </div>
+        <div class="order-actions detail-order-actions" th:with="item=${order.items[0]}, counterpart=${order.buyer.username.equalsIgnoreCase(currentUser.username) ? order.seller : order.buyer}">
+            <a class="ghost-button compact-action" th:href="@{/orders}">К заказам</a>
+            <a class="ghost-button compact-action" th:href="@{/chats/products/{productId}/users/{username}(productId=${item.product.id}, username=${counterpart.username})}">Написать</a>
+            <form th:if="${order.seller.username.equalsIgnoreCase(currentUser.username) && order.status.name() == 'NEW'}" th:action="@{/orders/{id}/confirm(id=${order.id})}" method="post" data-submit-once>
+                <button class="primary-button compact-action" type="submit">Подтвердить</button>
+            </form>
+            <form th:if="${order.buyer.username.equalsIgnoreCase(currentUser.username) && order.status.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/complete(id=${order.id})}" method="post" data-submit-once>
+                <button class="primary-button compact-action" type="submit">Завершить</button>
+            </form>
+            <form th:if="${order.status.name() == 'NEW' || order.status.name() == 'CONFIRMED'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" data-submit-once>
+                <button class="ghost-button compact-action" type="submit">Отменить</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

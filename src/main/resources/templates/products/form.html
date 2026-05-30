@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${product == null ? 'Новый товар' : 'Редактирование'})}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+<main class="narrow-page">
+    <section class="section-heading">
+        <div>
+            <span class="eyebrow">витрина</span>
+            <h1 th:text="${product == null} ? 'Новый товар' : 'Редактирование товара'">Новый товар</h1>
+        </div>
+    </section>
+    <form class="form-card wide reveal"
+          th:action="${product == null} ? @{/products} : @{/products/{id}/edit(id=${product.id})}"
+          th:object="${productForm}"
+          method="post"
+          data-submit-once>
+        <label>
+            <span>Название</span>
+            <input th:field="*{title}" required maxlength="140">
+            <small th:errors="*{title}"></small>
+        </label>
+        <label>
+            <span>Описание</span>
+            <textarea th:field="*{description}" rows="7" required minlength="20" maxlength="2500"></textarea>
+            <small th:errors="*{description}"></small>
+        </label>
+        <div class="form-grid">
+            <label>
+                <span>Цена</span>
+                <input th:field="*{price}" type="number" min="0.01" step="0.01" required>
+                <small th:errors="*{price}"></small>
+            </label>
+            <label>
+                <span>Место встречи</span>
+                <input th:field="*{campus}" required maxlength="160">
+                <small th:errors="*{campus}"></small>
+            </label>
+        </div>
+        <div class="form-grid">
+            <label>
+                <span>Состояние</span>
+                <select th:field="*{condition}">
+                    <option th:each="condition : ${conditions}" th:value="${condition}" th:text="${condition.label}">Хорошее</option>
+                </select>
+                <small th:errors="*{condition}"></small>
+            </label>
+            <label>
+                <span>Ссылка на изображение</span>
+                <input th:field="*{imageUrl}" placeholder="/images/studymarket-hero.png">
+                <small th:errors="*{imageUrl}"></small>
+            </label>
+        </div>
+        <fieldset class="choice-field">
+            <legend>Категории</legend>
+            <label th:each="category : ${categories}">
+                <input type="checkbox" th:field="*{categoryIds}" th:value="${category.id}">
+                <span th:text="${category.name}">Категория</span>
+            </label>
+            <small th:errors="*{categoryIds}"></small>
+        </fieldset>
+        <div class="form-actions">
+            <a class="ghost-button" th:href="@{/}">Отмена</a>
+            <button class="primary-button" type="submit">Сохранить</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

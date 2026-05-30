@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Ошибка')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="narrow-page">
+    <section class="empty-state reveal">
+        <span class="eyebrow" th:text="${status}">404</span>
+        <h1 th:text="${error}">Ошибка</h1>
+        <p th:text="${message}">Сообщение</p>
+        <a class="primary-button" th:href="@{/}">В каталог</a>
+    </section>
+</main>
+</body>
+</html>

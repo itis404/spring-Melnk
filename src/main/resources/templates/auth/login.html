@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Вход')}"></head>
+<body class="auth-page">
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="auth-layout">
+    <section class="auth-copy reveal">
+        <span class="eyebrow">аккаунт</span>
+        <h1>Войдите, чтобы покупать, продавать и писать в чат.</h1>
+        <p>После входа доступны заказы, избранное, личные сообщения и публикация объявлений.</p>
+    </section>
+    <form class="form-card reveal" th:action="@{/login}" method="post" data-submit-once>
+        <h2>Вход</h2>
+        <div class="flash danger" th:if="${param.error}">Неверный логин или пароль</div>
+        <div class="flash success" th:if="${param.logout}">Вы вышли из аккаунта</div>
+        <div class="flash success" th:if="${success}" th:text="${success}">Аккаунт создан</div>
+        <label>
+            <span>Логин</span>
+            <input name="username" autocomplete="username" required>
+        </label>
+        <label>
+            <span>Пароль</span>
+            <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button class="primary-button" type="submit">Войти</button>
+        <p class="muted">Демо: seller / password или buyer / password</p>
+        <a th:href="@{/register}">Создать аккаунт</a>
+    </form>
+</main>
+</body>
+</html>

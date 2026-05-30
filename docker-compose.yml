@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: studymarket-postgres
+    environment:
+      POSTGRES_DB: studymarket
+      POSTGRES_USER: studymarket
+      POSTGRES_PASSWORD: studymarket
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studymarket -d studymarket"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: studymarket-redis
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: studymarket-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/studymarket
+      SPRING_DATASOURCE_USERNAME: studymarket
+      SPRING_DATASOURCE_PASSWORD: studymarket
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      SERVER_PORT: 8080
+      JAVA_TOOL_OPTIONS: -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_API_BASE_URL: ${TELEGRAM_API_BASE_URL:-https://api.telegram.org}
+      TELEGRAM_WEBHOOK_SECRET_TOKEN: ${TELEGRAM_WEBHOOK_SECRET_TOKEN:-}
+      TELEGRAM_COMMANDS_ENABLED: ${TELEGRAM_COMMANDS_ENABLED:-true}
+      TELEGRAM_POLLING_ENABLED: ${TELEGRAM_POLLING_ENABLED:-true}
+      TELEGRAM_PROXY_HOST: ${TELEGRAM_PROXY_HOST:-}
+      TELEGRAM_PROXY_PORT: ${TELEGRAM_PROXY_PORT:-0}
+      TELEGRAM_PROXY_TYPE: ${TELEGRAM_PROXY_TYPE:-HTTP}
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:

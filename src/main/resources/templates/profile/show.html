@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Профиль')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/flash :: flash}"></div>
+
+<main class="profile-page">
+    <section class="profile-hero reveal">
+        <div class="profile-avatar">
+            <img th:if="${profileUser.avatarUrl != null && !profileUser.avatarUrl.isBlank()}" th:src="${profileUser.avatarUrl}" th:alt="${profileUser.fullName}">
+            <span th:if="${profileUser.avatarUrl == null || profileUser.avatarUrl.isBlank()}"
+                  th:text="${#strings.substring(profileUser.fullName, 0, 1)}">S</span>
+        </div>
+        <div class="profile-copy">
+            <span class="profile-badge">Личный кабинет</span>
+            <h1 th:text="${profileUser.fullName}">Имя пользователя</h1>
+            <p>
+                <span th:text="'@' + ${profileUser.username}">@user</span>
+                <span th:text="${profileUser.email}">mail@example.com</span>
+            </p>
+        </div>
+        <div class="profile-actions">
+            <a class="ghost-button" th:href="@{/orders}">Заказы</a>
+            <a class="ghost-button sell-button" th:href="@{/products/new}">Добавить товар</a>
+        </div>
+    </section>
+
+    <section class="profile-summary reveal">
+        <article>
+            <strong th:text="${#lists.size(activeProducts)}">0</strong>
+            <span>активных объявлений</span>
+        </article>
+        <article>
+            <strong th:text="${#lists.size(archivedProducts)}">0</strong>
+            <span>в архиве</span>
+        </article>
+        <article>
+            <strong th:text="${profileUser.telegramChatId == null || profileUser.telegramChatId.isBlank() ? 'Telegram не подключен' : 'Telegram подключен'}">Telegram подключен</strong>
+            <span th:text="${profileUser.telegramChatId == null || profileUser.telegramChatId.isBlank() ? 'напишите боту /id' : 'уведомления включены'}">уведомления включены</span>
+        </article>
+    </section>
+
+    <section class="profile-grid">
+        <form class="form-card profile-settings reveal" th:action="@{/profile}" th:object="${profileForm}" method="post" data-submit-once>
+            <h2>Настройки профиля</h2>
+            <label>
+                <span>Имя</span>
+                <input th:field="*{fullName}" required maxlength="120">
+                <small th:errors="*{fullName}"></small>
+            </label>
+            <label>
+                <span>Email</span>
+                <input th:field="*{email}" type="email" required>
+                <small th:errors="*{email}"></small>
+            </label>
+            <label>
+                <span>Telegram chat id</span>
+                <input th:field="*{telegramChatId}" placeholder="Напишите боту /id и вставьте chat id">
+                <small th:errors="*{telegramChatId}"></small>
+            </label>
+            <label>
+                <span>Ссылка на аватар</span>
+                <input th:field="*{avatarUrl}" placeholder="https://... или /images/avatars/alina.svg">
+                <small th:errors="*{avatarUrl}"></small>
+            </label>
+            <button class="primary-button" type="submit">Сохранить профиль</button>
+        </form>
+
+        <aside class="profile-aside reveal">
+            <h2>Аккаунт</h2>
+            <div class="profile-info-list">
+                <span>Публичное имя</span>
+                <strong th:text="${profileUser.fullName}">Имя пользователя</strong>
+                <span>Логин</span>
+                <strong th:text="'@' + ${profileUser.username}">@user</strong>
+                <span>Почта</span>
+                <strong th:text="${profileUser.email}">mail@example.com</strong>
+            </div>
+            <form class="telegram-test-form" th:action="@{/profile/telegram-test}" method="post" data-submit-once>
+                <button class="ghost-button compact-action" type="submit">Отправить тест в Telegram</button>
+            </form>
+        </aside>
+    </section>
+
+    <section class="section-wrap">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">продажи</span>
+                <h2>Мои объявления</h2>
+            </div>
+            <a class="ghost-button" th:href="@{/products/new}">Добавить товар</a>
+        </div>
+        <div class="product-grid" th:if="${!activeProducts.isEmpty()}">
+            <th:block th:each="product : ${activeProducts}">
+                <div th:replace="~{fragments/product-card :: card(${product}, ${favoriteIds})}"></div>
+            </th:block>
+        </div>
+        <div class="empty-state" th:if="${activeProducts.isEmpty()}">
+            <h3>Активных объявлений нет</h3>
+            <p>Опубликуйте товар, чтобы он появился в каталоге.</p>
+            <div class="empty-actions">
+                <a class="primary-button" th:href="@{/products/new}">Добавить товар</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-wrap">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">история</span>
+                <h2>Архив</h2>
+            </div>
+            <p class="muted">Сюда попадают скрытые, забронированные и проданные объявления.</p>
+        </div>
+        <div class="product-grid archive-grid" th:if="${!archivedProducts.isEmpty()}">
+            <th:block th:each="product : ${archivedProducts}">
+                <div th:replace="~{fragments/product-card :: card(${product}, ${favoriteIds})}"></div>
+            </th:block>
+        </div>
+        <div class="empty-state" th:if="${archivedProducts.isEmpty()}">
+            <h3>Архив пока пуст</h3>
+            <p>Когда товар будет снят с продажи или забронирован, он останется здесь.</p>
+            <div class="empty-actions">
+                <a class="ghost-button" th:href="@{/}">Посмотреть каталог</a>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Ошибка сервера')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="narrow-page">
+    <section class="empty-state reveal">
+        <span class="eyebrow">500</span>
+        <h1>Ошибка сервера</h1>
+        <p>Мы записали проблему в лог. Вернитесь в каталог и попробуйте еще раз.</p>
+        <a class="primary-button" th:href="@{/}">В каталог</a>
+    </section>
+</main>
+</body>
+</html>

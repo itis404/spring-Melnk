@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Аватар Данил">
+  <rect width="240" height="240" rx="48" fill="#2f7df6"/>
+  <circle cx="68" cy="74" r="34" fill="#23a36f"/>
+  <circle cx="164" cy="154" r="56" fill="#15171d"/>
+  <path d="M46 188c22-48 60-78 115-90 24 17 36 40 36 70 0 17-5 31-14 43H68c-9-5-16-13-22-23Z" fill="#fff" opacity=".94"/>
+  <text x="120" y="137" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="800" fill="#15171d">Д</text>
+</svg>
